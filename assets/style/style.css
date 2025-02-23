@@ -1,0 +1,186 @@
+/* CSS VARIABLES */
+:root {
+    --main-color: #bd633d;
+    --second-color: #3f7fbd;
+    --third-color: #eeefef;
+    --error-color: #f44336;
+}
+
+/* CORE CSS RULES */
+* {
+    font-family: "Bebas Neue", sans-serif;
+    color: #333;
+    box-sizing: border-box;
+    outline: none;
+}
+
+html, body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+a {
+    color: var(--main-color);
+}
+
+a:hover,
+a:focus {
+    color: var(--second-color);
+}
+
+
+/* GENERAL CLASSES */
+
+.simple-text {
+    font-size: 18px;
+}
+
+/* NOTIFICATIONS */
+.notification-container {
+    position: fixed;
+    width: 100%;
+    top: -100%;
+    left: 50%;
+    background-color: aliceblue;
+    opacity: 0;
+    visibility: hidden;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    transform: translateX(-50%);
+    transition: all 1s;
+}
+.notification-container.vis {
+    opacity: 1;
+    visibility: visible;
+    animation: Slide_Down 3s ease-in-out forwards;
+}
+
+.successful-notify .msg {
+    color: var(--second-color);
+}
+.error-notify .msg {
+    color: var(--error-color);
+}
+
+
+
+
+/* REGISTER */
+.sing-in-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh;
+    height: fit-content;
+    background-color: var(--third-color);
+    padding: 1rem 0;
+}
+
+.sing-in-container .column {
+    width: 450px;
+    min-height: 300px;
+    max-height: 100%;
+    background-color: white;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    padding: 30px 40px;
+}
+
+.sing-in-container .zeflix-logo {
+    display: block;
+    position: relative;
+    width: 150px;
+    object-fit: contain;
+    margin-bottom: 5px;
+    margin-left: -8px;
+}
+
+.sing-in-container .title {
+    text-align: left;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.sing-in-container .subtitle {
+    margin: 10px 0;
+}
+
+.sing-in-container .account-entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 40px;
+    padding: 10px 0;
+}
+
+.sing-in-container .account-entry-form .form-label-field {
+    width: 100%;
+}
+
+.sing-in-container .account-entry-form input {
+    width: 100%;
+    border: 1px solid transparent;
+    border-bottom: 1px solid #e4e4e4;
+    margin: 0;
+    padding: 5px 1px;
+    transition: all 0.4s;
+}
+
+.sing-in-container .account-entry-form input:focus,
+.sing-in-container .account-entry-form input.error_field:focus  {
+    outline: none;
+    border-radius: 5px;
+    border: 1px solid var(--second-color);
+    padding: 10px 5px;
+}
+
+
+.sing-in-container .account-entry-form input[type="submit"] {
+    width: fit-content;
+    background-color: var(--second-color);
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin: 15px 0;
+    padding: 10px;
+    transition: all 0.3s;
+}
+
+.sing-in-container .account-entry-form input[type="submit"]:hover,
+.sing-in-container .account-entry-form input[type="submit"]:focus {
+    background-color: var(--main-color);
+    color: black;
+    box-shadow: 0 0 2px black;
+}
+
+.sing-in-container .account-entry-form .form-label-field .error_field {
+    border-bottom: 1px solid var(--error-color);
+}
+
+.sing-in-container .account-entry-form .form-label-field .error-form-msg {
+    display: block;
+    background-color: transparent;
+    color: var(--error-color);
+    margin: 0;
+    padding: 4px;
+}
+
+
+
+
+/* ANIMATIONS */
+@keyframes Slide_Down {
+    0% {
+        top: -100%;
+    }
+    10% {
+        top: 0;
+    }
+    90% {
+        top: 0;
+    }
+    100% {
+        top: -100%;
+    }
+}

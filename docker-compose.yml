@@ -1,0 +1,49 @@
+
+services:
+  app:
+    build: .
+    container_name: php_app
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_CHARSET: utf8mb4
+      DB_NAME: zeflix_db
+      DB_USER: zeflix_
+      DB_PASSWORD: zeflix@1_2
+      XDEBUG_MODE: debug
+      XDEBUG_SESSION: PHPSTORM
+      XDEBUG_CONFIG: "client_host=host.docker.internal client_port=9003 start_with_request=yes"
+
+
+
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql   # Load structure
+    environment:
+      MYSQL_ROOT_PASSWORD: root_@_zeflix@1_2
+      MYSQL_DATABASE: zeflix_db
+      MYSQL_USER: zeflix_
+      MYSQL_PASSWORD: zeflix@1_2
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root_@_zeflix@1_2
+    ports:
+      - "8081:80"
