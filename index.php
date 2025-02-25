@@ -1,13 +1,13 @@
 <?php
 
-require_once './db/config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/db/config.php';
 
-require_once './Entities/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/User.php';
 
 global $db_conn;
+global $route;
+global $session;
 
-$session = new Session($db_conn);
+$route->redirectToPage($_SESSION['last_visited_page']);
+
 $user = new User($db_conn);
-var_dump($_SESSION);
-//if()
-echo 'hello';

@@ -1,8 +1,9 @@
 <?php
 
-require_once './Models/Model.php';
-require_once './Entities/Session.php';
-require_once './Templates/NotificationMsg.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Models/Model.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/Session.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Route/Route.php';
 
 ob_start();
 
@@ -22,3 +23,17 @@ try {
 catch (PDOException $e) {
     echo "<strong>Connection with database failed:</strong> ".$e->getMessage();
 }
+
+
+$route = new Route(basename($_SERVER['SCRIPT_FILENAME']));
+$route->addPages([
+    'Root' => 'index.php',
+    'Login' => 'Login.php',
+    'Register' => 'Register.php',
+    'Home' => 'Home.php',
+    'About' => 'About.php',
+]);
+
+
+$session = new Session($db_conn, $route);
+$session->noTokenRedirect('login.php');

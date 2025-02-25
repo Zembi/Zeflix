@@ -1,13 +1,14 @@
 <?php
 
-    require_once './db/config.php';
-    require_once './Entities/User.php';
+    require_once $_SERVER['DOCUMENT_ROOT'].'/db/config.php';
+    require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/User.php';
 
-    require_once './Templates/NotificationMsg.php';
+    require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
 
     global $db_conn;
+    global $route;
 
-    $session = new Session($db_conn);
+    $session = new Session($db_conn, $route);
     $user = new User($db_conn);
 
     if(isset($_POST['submitRegister'])) {
@@ -41,8 +42,12 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Welcome to Zeflix</title>
-        <link rel="stylesheet" type="text/css" href="assets/style/style.css" />
+        <link rel="stylesheet" type="text/css" href="../assets/style/style.css" />
     </head>
     <body>
         <?php
@@ -56,7 +61,7 @@
         ?>
         <div class="sing-in-container">
             <div class="column">
-                <img class="zeflix-logo" src="assets/images/zeflix_image.png" title="Zeflix" alt="zeflix logo" />
+                <img class="zeflix-logo" src="../assets/images/zeflix_image.png" title="Zeflix" alt="zeflix logo" />
                 <h2 class="title">Sign Up</h2>
                 <span class="subtitle simple-text">to continue to VideoTube</span>
                 <form class="register-form account-entry-form" method="POST" action="">
@@ -105,7 +110,7 @@
 
                     <input type="submit" name="submitRegister" class="simple-text" value="Register"/>
                 </form>
-                <span>Already have an account? <a href="./login.php">Sign in here!</a></span>
+                <span>Already have an account? <a href="./Login.php">Sign in here!</a></span>
             </div>
         </div>
     </body>

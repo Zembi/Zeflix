@@ -1,9 +1,9 @@
 <?php
 
-require_once './Tools/HandleInternalMsgs.php';
-require_once './Models/User.php';
-require_once './Tools/FormSanitizer.php';
-require_once './Tools/FormValidator.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/HandleInternalMsgs.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Models/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/FormSanitizer.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/FormValidator.php';
 
 class User {
     private User_Model $user_model;

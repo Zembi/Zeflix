@@ -1,15 +1,19 @@
 <?php
 
-require_once './Models/Session.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Models/Session.php';
 
 class Session {
     private Session_Model $session_model;
     private User $user;
+    private Route $route;
 
-    public function __construct(PDO|null $db_conn) {
+    public function __construct(PDO|null $db_conn, Route $route) {
         session_start();
 
+        $this->route = $route;
         if($db_conn) $this->initDbConnection($db_conn);
+
+        $this->setLastVisitedPage($this->route->getCurrentFileName());
     }
 
     public function initDbConnection(PDO $db_conn): void {
@@ -131,6 +135,16 @@ class Session {
 
         $_SESSION['user_token_logged_in'] = $this->session_model->handle_user_session_token($_SESSION['user_token_logged_in'], $user);
 
-        header('Location: index.php');
+        $this->route->redirectToRoot();
+    }
+
+    public function noTokenRedirect(string $targetPage): void {
+        if(!isset($_SESSION['user_token_logged_in']) || empty($_SESSION['user_token_logged_in'])) {
+            $this->route->redirectToPage($targetPage);
+        }
+    }
+
+    public function setLastVisitedPage(string $lastVisitedPage): void {
+        $_SESSION['last_visited_page'] = $lastVisitedPage;
     }
 }
