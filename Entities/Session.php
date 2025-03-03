@@ -13,7 +13,7 @@ class Session {
         $this->route = $route;
         if($db_conn) $this->initDbConnection($db_conn);
 
-        $this->setLastVisitedPage($this->route->getCurrentFileName());
+        $this->setLastVisitedPage($this->route->getCurrentPageName());
     }
 
     public function initDbConnection(PDO $db_conn): void {
@@ -139,7 +139,11 @@ class Session {
     }
 
     public function noTokenRedirect(string $targetPage): void {
+        var_dump($_SESSION['last_visited_page']);
         if(!isset($_SESSION['user_token_logged_in']) || empty($_SESSION['user_token_logged_in'])) {
+            $this->route->redirectToPage($targetPage);
+        }
+        if(!isset($_SESSION['last_visited_page']) || empty($_SESSION['last_visited_page'])) {
             $this->route->redirectToPage($targetPage);
         }
     }

@@ -1,6 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'].'/Models/Model.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/Page.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/Session.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
 require_once $_SERVER['DOCUMENT_ROOT'].'/Route/Route.php';
@@ -25,15 +26,17 @@ catch (PDOException $e) {
 }
 
 
-$route = new Route(basename($_SERVER['SCRIPT_FILENAME']));
-$route->addPages([
-    'Root' => 'index.php',
-    'Login' => 'Login.php',
-    'Register' => 'Register.php',
-    'Home' => 'Home.php',
-    'About' => 'About.php',
+$route = new Route($_SERVER['SCRIPT_FILENAME']);
+$route->addAllPages([
+    'root' => new Page('Root', '-', 'index.php', null),
+    'login' => new Page('Login', 'Sign In', 'Pages/login.php', true, false, true),
+    'register' => new Page('Register', 'Sign Up', 'Pages/register.php', true, false, true),
+    'home' => new Page('Home', 'Welcome to Zeflix', 'Pages/home.php', false, true, false),
+    'about' => new Page('About', 'About Us', 'Pages/about.php', false, true, false),
 ]);
 
-
 $session = new Session($db_conn, $route);
-$session->noTokenRedirect('login.php');
+
+if(!$route->isCurrentPagePublic()) {
+    $session->noTokenRedirect('Login');
+}

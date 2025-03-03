@@ -8,6 +8,4 @@ global $db_conn;
 global $route;
 global $session;
 
-$route->redirectToPage($_SESSION['last_visited_page']);
-
 $user = new User($db_conn);
