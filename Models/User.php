@@ -63,4 +63,25 @@ class User_Model extends Model {
     public function sign_in_user(array $data): array {
         return HandleInternalMsgs::succesMsgOnReturn($data);
     }
+
+    public function fetch_user(array $data): array {
+        if(isset($data['username'])) {
+            $query = $this->db->prepare("SELECT * FROM users WHERE username = :username");
+            $query->bindParam(":username", $data['username']);
+        }
+        else if(isset($data['email'])) {
+            $query = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+            $query->bindParam(":email", $data['email']);
+        }
+        else {
+            return [];
+        }
+
+        $executed = $query->execute();
+
+        if($executed && $query->rowCount() > 0) {
+            var_dump($query->fetchColumn());
+        }
+        return [];
+    }
 }

@@ -4,12 +4,14 @@ class Route {
     /** @var Page[] */
     private array $all_pages = [];
     /** @var Page[] */
-    private array $public_pages = [];
+    public array $public_pages = [];
     /** @var Page[] */
-    private array $private_pages = [];
+    public array $private_pages = [];
 
     private string $currentFilePath;
     private string $currentFileName;
+
+    private Page $currentPage;
     private string $currentPageName;
     private ?bool $isCurrentPagePublic;
 
@@ -25,9 +27,12 @@ class Route {
     public function getCurrentFileName(): ?string {
         return $this->currentFileName;
     }
+    public function getCurrentPage(): Page {
+        return $this->currentPage;
+    }
 
     public function getCurrentPageName(): ?string {
-        return $this->currentPageName;
+        return $this->currentPage->getName();
     }
 
     public function isCurrentPagePublic(): ?bool {
@@ -42,13 +47,13 @@ class Route {
 //            AVOID DUPLICATE ENTRIES IN ROUTING BASED ON FILE NAME
             $file = $page->getFile();
             $page_name = $page->getName();
-            if ($file && $this->isPageAlreadyAdded($page_name)) {
+            if($file && $this->isPageAlreadyAdded($page_name)) {
                 continue;
             }
 
-            if($this->findPageFromFilePath($this->currentFilePath, $page->getFilePath())) $this->currentPageName = $page_name;
-
-            if($file === $this->getCurrentFileName()) {
+            $isCurrPage = $this->findPageFromFilePath($this->currentFilePath, $page->getFilePath());
+            if($isCurrPage) {
+                $this->currentPage = $page;
                 $this->isCurrentPagePublic = $page->isPublic();
             }
 
@@ -70,9 +75,16 @@ class Route {
         return false;
     }
 
+    private function findPageFromFilePath(string $absolutePath, string $relativePath): bool {
+        $basePath = "/var/www/html/";
+        $normalizedAbsolute = strtolower(str_replace($basePath, "", $absolutePath));
+        $normalizedRelative = strtolower($relativePath);
+
+        return $normalizedAbsolute === $normalizedRelative;
+    }
+
     public function redirectToPage(?string $targetPage): void {
-        var_dump($targetPage);
-        if(!$targetPage || empty($targetPage) || $targetPage === 'root') {
+        if(!$targetPage || empty($targetPage) || $targetPage === 'Root') {
             $this->redirectToRoot();
             return;
         }
@@ -87,26 +99,18 @@ class Route {
 
     public function redirectToRoot(): void {
         foreach($this->all_pages as $page) {
-            if($page->getName() === 'root') {
+            if($page->getName() === 'Root') {
                 header('Location: /'.$page->getFile());
             }
         }
     }
 
     public function getPageLink(string $page_name): string {
-        foreach($this->all_pages as $index => $page) {
-            if($index === $page_name) {
+        foreach($this->all_pages as $page) {
+            if($page->getName() === $page_name) {
                 return $page->getPageLink();
             }
         }
         return '/';
-    }
-
-    public function findPageFromFilePath(string $absolutePath, string $relativePath): bool {
-        $basePath = "/var/www/html/";
-        $normalizedAbsolute = strtolower(str_replace($basePath, "", $absolutePath));
-        $normalizedRelative = strtolower($relativePath);
-
-        return $normalizedAbsolute === $normalizedRelative;
     }
 }

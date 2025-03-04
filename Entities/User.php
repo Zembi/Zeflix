@@ -186,4 +186,9 @@ class User {
 
         return $this->user_model->sign_in_user($sanitized_data);
     }
+
+    public function fetchUserData(array $data): User {
+        $user_rest_data = $this->user_model->fetch_user($data);
+        return $this;
+    }
 }

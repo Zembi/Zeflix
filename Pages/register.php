@@ -1,6 +1,6 @@
 <?php
 
-    require_once $_SERVER['DOCUMENT_ROOT'].'/db/config.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
     require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/User.php';
 
     require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
@@ -53,6 +53,7 @@
         <?php
         if(!empty($success_message)) {
             NotificationMsg::successfulNotify(htmlspecialchars($success_message));
+            var_dump($_SESSION);
             $session->successfulSingIn($user);
         }
         else if(count($errors) > 0) {

@@ -133,19 +133,20 @@ class Session {
         $this->clearVisitorsSessionData();
         $this->setUser($user);
 
-        $_SESSION['user_token_logged_in'] = $this->session_model->handle_user_session_token($_SESSION['user_token_logged_in'], $user);
+        $responseToken = $this->session_model->handle_user_session_token($_SESSION['user_token_logged_in'], $user, $this->route->getCurrentPage());
+        if($responseToken && !empty($responseToken)) {
+            $_SESSION['user_token_logged_in'] = $responseToken;
+        }
 
         $this->route->redirectToRoot();
     }
 
-    public function noTokenRedirect(string $targetPage): void {
-        var_dump($_SESSION['last_visited_page']);
-        if(!isset($_SESSION['user_token_logged_in']) || empty($_SESSION['user_token_logged_in'])) {
-            $this->route->redirectToPage($targetPage);
+    public function isCurrentUserInSession(): bool {
+        $user_token = $_SESSION['user_token_logged_in'] ?? null;
+        if($user_token && !empty($user_token)) {
+            return $this->session_model->confirm_user_session_token($user_token);
         }
-        if(!isset($_SESSION['last_visited_page']) || empty($_SESSION['last_visited_page'])) {
-            $this->route->redirectToPage($targetPage);
-        }
+        return false;
     }
 
     public function setLastVisitedPage(string $lastVisitedPage): void {
