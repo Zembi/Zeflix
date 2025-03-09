@@ -5,6 +5,8 @@ class Session_Model extends Model {
         $username = $user->getUsername();
         $newToken = bin2hex(random_bytes(15));
 
+        var_dump($token);
+
         if($token) {
             $checkQuery = $this->db->prepare("SELECT token FROM session WHERE username = :username");
             $checkQuery->execute([":username" => $username]);
@@ -32,16 +34,15 @@ class Session_Model extends Model {
         ]);
 
         if($executedIns) {
-            return $token ?: $newToken;
+            return $newToken;
         }
 
         return null;
     }
 
-    public function confirm_user_session_token(string $token): bool {
+    public function confirm_user_session_token(string $token): ?string {
         $checkQuery = $this->db->prepare("SELECT username FROM session WHERE token = :token");
         $checkQuery->execute([":token" => $token]);
-        $existingToken = $checkQuery->fetchColumn();
-        return false;
+        return $checkQuery->fetchColumn();
     }
 }

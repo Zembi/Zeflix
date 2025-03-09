@@ -4,8 +4,8 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/Models/Session.php';
 
 class Session {
     private Session_Model $session_model;
-    private User $user;
     private Route $route;
+    private ?User $user;
 
     public function __construct(PDO|null $db_conn, Route $route) {
         session_start();
@@ -14,10 +14,16 @@ class Session {
         if($db_conn) $this->initDbConnection($db_conn);
 
         $this->setLastVisitedPage($this->route->getCurrentPageName());
+
+        $this->user = null;
     }
 
     public function initDbConnection(PDO $db_conn): void {
         $this->session_model = new Session_Model($db_conn);
+    }
+
+    public function getUser(): ?User {
+        return $this->user;
     }
 
     public function setUser(User $user): void {
@@ -141,10 +147,18 @@ class Session {
         $this->route->redirectToRoot();
     }
 
-    public function isCurrentUserInSession(): bool {
+    public function isUserLoggedInInSession(): bool {
         $user_token = $_SESSION['user_token_logged_in'] ?? null;
+
         if($user_token && !empty($user_token)) {
-            return $this->session_model->confirm_user_session_token($user_token);
+            $usernameFound = $this->session_model->confirm_user_session_token($user_token);
+            if($usernameFound) {
+                $user = $this->user->fetchUserDataFromDB(['username' => $usernameFound]);
+                if($user) {
+                    $this->user = $user;
+                    return true;
+                }
+            }
         }
         return false;
     }

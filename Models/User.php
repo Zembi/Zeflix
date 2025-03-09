@@ -57,14 +57,14 @@ class User_Model extends Model {
         if($executed && $query->rowCount() > 0) {
             return HandleInternalMsgs::succesMsgOnReturn(['id' => $last_id]);
         }
-        return HandleInternalMsgs::errorMsgOnReturn(['id' => $last_id]);;
+        return HandleInternalMsgs::errorMsgOnReturn(['id' => $last_id]);
     }
 
     public function sign_in_user(array $data): array {
         return HandleInternalMsgs::succesMsgOnReturn($data);
     }
 
-    public function fetch_user(array $data): array {
+    public function fetch_user(array $data): ?array {
         if(isset($data['username'])) {
             $query = $this->db->prepare("SELECT * FROM users WHERE username = :username");
             $query->bindParam(":username", $data['username']);
@@ -74,14 +74,14 @@ class User_Model extends Model {
             $query->bindParam(":email", $data['email']);
         }
         else {
-            return [];
+            return null;
         }
 
         $executed = $query->execute();
 
         if($executed && $query->rowCount() > 0) {
-            var_dump($query->fetchColumn());
+            return $query->fetchAll();
         }
-        return [];
+        return null;
     }
 }

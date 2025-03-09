@@ -12,6 +12,7 @@ class User {
     private string $last_name;
     private string $email;
     private string $password;
+    private string $is_subscribed;
 
     private string $session_token;
 
@@ -36,6 +37,9 @@ class User {
     public function getPassword(): string {
         return $this->password;
     }
+    public function getSubscriptionStatus(): int {
+        return $this->is_subscribed;
+    }
 
     public function getSessionToken(): string {
         return $this->session_token;
@@ -56,6 +60,9 @@ class User {
     }
     private function setPassword(string $password): void {
         $this->password = $password;
+    }
+    private function setSubscribtionStatus(int $is_subscribed): void {
+        $this->is_subscribed = $is_subscribed;
     }
 
     private function setSessionToken(string $session_token): void {
@@ -178,8 +185,8 @@ class User {
 
         $this->setUsername($username);
 
-        $password_confirmed = $this->confirmHashedPasswordMatch($password);
-        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
+//        $password_confirmed = $this->confirmHashedPasswordMatch($password);
+//        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
 
 //      EXIT HERE IF ERRORS FOUND
         if(!empty($errors)) return HandleInternalMsgs::errorMsgOnReturn($errors);
@@ -187,8 +194,18 @@ class User {
         return $this->user_model->sign_in_user($sanitized_data);
     }
 
-    public function fetchUserData(array $data): User {
-        $user_rest_data = $this->user_model->fetch_user($data);
+    public function fetchUserDataFromDB(array $data): ?User {
+        $user_data = $this->user_model->fetch_user($data);
+
+        if(!$user_data) return null;
+
+        $user_data = $user_data[0];
+        $this->username = $user_data['username'];
+        $this->first_name = $user_data['first_name'];
+        $this->last_name = $user_data['last_name'];
+        $this->email = $user_data['email'];
+        $this->is_subscribed = $user_data['is_subscribed'];
+
         return $this;
     }
 }

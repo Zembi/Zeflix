@@ -1,6 +1,7 @@
 <?php
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Models/Model.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/Entities/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Entities/Page.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Entities/Session.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/Templates/NotificationMsg.php';
@@ -35,15 +36,25 @@ $route->addAllPages([
     new Page('About', 'About Us', 'Pages/about.php', false, true, false),
 ]);
 
+$user = new User($db_conn);
 $session = new Session($db_conn, $route);
+$session->setUser($user);
 
+if(!isset($_POST['submitLogin']) && !isset($_POST['submitRegister'])) {
+    $target_page = 'About';
+    $is_user_logged_in = $session->isUserLoggedInInSession();
+    if(!$route->isCurrentPagePublic()) {
+        if(!$is_user_logged_in) {
+            $route->redirectToPage('Login');
+        }
 
-if(!$route->isCurrentPagePublic()) {
-    if($session->isCurrentUserInSession()) {
-        var_dump('tet');
-
+        if($route->getCurrentPageName() == 'Root') {
+            $route->redirectToPage($target_page);
+        }
     }
     else {
-        $route->redirectToPage('Login');
+        if($is_user_logged_in) {
+            $route->redirectToPage($target_page);
+        }
     }
 }

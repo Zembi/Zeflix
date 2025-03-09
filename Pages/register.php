@@ -1,15 +1,13 @@
 <?php
 
     require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
-    require_once $_SERVER['DOCUMENT_ROOT'].'/Entities/User.php';
 
     require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
 
     global $db_conn;
     global $route;
     global $session;
-
-    $user = new User($db_conn);
+    global $user;
 
     if(isset($_POST['submitRegister'])) {
         $form_data = [

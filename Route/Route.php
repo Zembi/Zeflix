@@ -4,15 +4,14 @@ class Route {
     /** @var Page[] */
     private array $all_pages = [];
     /** @var Page[] */
-    public array $public_pages = [];
+    public array $pages_only_for_users = [];
     /** @var Page[] */
-    public array $private_pages = [];
+    public array $pages_only_for_visitors = [];
 
     private string $currentFilePath;
     private string $currentFileName;
 
     private Page $currentPage;
-    private string $currentPageName;
     private ?bool $isCurrentPagePublic;
 
     public function __construct(string $currentFilePath) {
@@ -59,11 +58,11 @@ class Route {
 
             $this->all_pages[$page->getName()] = $page;
 
-            if(!$page->isPublic()) {
-                $this->private_pages[$page->getName()] = $page;
+            if($page->isOnlyUsers()) {
+                $this->pages_only_for_users[$page->getName()] = $page;
             }
-            else {
-                $this->public_pages[$page->getName()] = $page;
+            else if($page->isOnlyVisitors()) {
+                $this->pages_only_for_visitors[$page->getName()] = $page;
             }
         }
     }
