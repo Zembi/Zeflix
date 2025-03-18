@@ -3,7 +3,10 @@
 class User_Model extends Model {
 //  FINDERS
     public function available_username(string $username): bool {
-        $query = $this->db->prepare("SELECT username FROM users WHERE username = :username");
+        $query = $this->db->prepare("
+            SELECT username
+            FROM users
+            WHERE username = :username");
         $query->bindParam(":username", $username);
 
         $executed = $query->execute();
@@ -15,7 +18,11 @@ class User_Model extends Model {
     }
 
     public function available_email(string $email): bool {
-        $query = $this->db->prepare("SELECT email FROM users WHERE email = :email");
+        $query = $this->db->prepare("
+            SELECT email
+            FROM users
+            WHERE email = :email
+        ");
         $query->bindParam(":email", $email);
 
         $executed = $query->execute();
@@ -28,22 +35,31 @@ class User_Model extends Model {
 
 
 //   RETRIEVERS
-    public function get_password(string $username): ?string {
-        $query = $this->db->prepare("SELECT password FROM users WHERE username = :username");
+    public function get_password(string $username): array {
+        $query = $this->db->prepare("
+            SELECT password
+            FROM users
+            WHERE username = :username
+        ");
         $query->bindParam(":username", $username);
 
         $executed = $query->execute();
 
         if($executed && $query->rowCount() > 0) {
-            return $query->fetchColumn();
+            $final_data = $query->fetch(PDO::FETCH_ASSOC);
+            return HandleInternalMsgs::succesMsgOnReturn($final_data);
         }
-        return null;
+        return HandleInternalMsgs::errorMsgOnReturn(['msg' => 'Username hasn\'t been registered']);
     }
 
 
 
     public function register_user(User $user): array {
-        $query = $this->db->prepare("INSERT INTO users (first_name, last_name, username, email, password) VALUES (:first_name, :last_name, :username, :email, :password)");
+        $this->setGreekTimezoneBeforeQuery();
+        $query = $this->db->prepare("
+            INSERT INTO users (first_name, last_name, username, email, password) 
+            VALUES (:first_name, :last_name, :username, :email, :password)
+        ");
         $executed = $query->execute([
             ':first_name' => $user->getFirstName(),
             ':last_name'  => $user->getLastName(),
@@ -64,24 +80,33 @@ class User_Model extends Model {
         return HandleInternalMsgs::succesMsgOnReturn($data);
     }
 
-    public function fetch_user(array $data): ?array {
+    public function fetch_user(array $data): array {
         if(isset($data['username'])) {
-            $query = $this->db->prepare("SELECT * FROM users WHERE username = :username");
+            $query = $this->db->prepare("
+                SELECT *
+                FROM users
+                WHERE username = :username
+            ");
             $query->bindParam(":username", $data['username']);
         }
         else if(isset($data['email'])) {
-            $query = $this->db->prepare("SELECT * FROM users WHERE email = :email");
+            $query = $this->db->prepare("
+                SELECT *
+                FROM users
+                WHERE email = :email
+            ");
             $query->bindParam(":email", $data['email']);
         }
         else {
-            return null;
+            return HandleInternalMsgs::errorMsgOnReturn(['msg' => 'Invalid parameter properties - username or email properties haven\'t been found']);
         }
 
         $executed = $query->execute();
 
         if($executed && $query->rowCount() > 0) {
-            return $query->fetchAll();
+            $final_data = $query->fetch(PDO::FETCH_ASSOC);
+            return HandleInternalMsgs::succesMsgOnReturn($final_data);
         }
-        return null;
+        return HandleInternalMsgs::errorMsgOnReturn(['msg' => 'Invalid username or email']);
     }
 }

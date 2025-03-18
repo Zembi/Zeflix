@@ -1,13 +1,12 @@
 <?php
 
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
-
     require_once $_SERVER['DOCUMENT_ROOT'].'/Templates/NotificationMsg.php';
 
     global $db_conn;
     global $route;
     global $session;
     global $user;
+    global $page;
 
     if(isset($_POST['submitRegister'])) {
         $form_data = [
@@ -44,7 +43,7 @@
         <meta name="viewport"
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Welcome to Zeflix</title>
+        <title><?= $page->getTitle() ?></title>
         <link rel="stylesheet" type="text/css" href="../assets/style/style.css" />
     </head>
     <body>

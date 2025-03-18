@@ -77,7 +77,7 @@ class User {
 
     private function confirmHashedPasswordMatch(string $password) : bool {
         $db_hashed_password = $this->user_model->get_password($this->getUsername());
-        return !$db_hashed_password ? false : password_verify($password, $db_hashed_password);
+        return !$db_hashed_password['status'] ? false : password_verify($password, $db_hashed_password['response']['password']);
     }
 
 
@@ -188,18 +188,15 @@ class User {
 //        $password_confirmed = $this->confirmHashedPasswordMatch($password);
 //        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
 
-//      EXIT HERE IF ERRORS FOUND
-        if(!empty($errors)) return HandleInternalMsgs::errorMsgOnReturn($errors);
-
         return $this->user_model->sign_in_user($sanitized_data);
     }
 
     public function fetchUserDataFromDB(array $data): ?User {
-        $user_data = $this->user_model->fetch_user($data);
+        $user_found = $this->user_model->fetch_user($data);
 
-        if(!$user_data) return null;
+        if(!$user_found['status']) return null;
 
-        $user_data = $user_data[0];
+        $user_data = $user_found['response'];
         $this->username = $user_data['username'];
         $this->first_name = $user_data['first_name'];
         $this->last_name = $user_data['last_name'];

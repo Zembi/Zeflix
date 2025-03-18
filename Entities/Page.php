@@ -6,15 +6,17 @@ class Page {
     private string $title;
     private string $file_path;
     private string $file_name;
+    private string $mask_name;
     private ?bool $public;
     private bool $only_users;
     private bool $only_visitors;
 
-    function __construct(string $name, string $title, string $file_path, ?bool $public, bool $only_users = false, bool $only_visitors = false) {
+    function __construct(string $name, string $title, string $file_path, string $mask_name, ?bool $public, bool $only_users = false, bool $only_visitors = false) {
         $this->name = $name;
         $this->title = $title;
         $this->file_path = $file_path;
         $this->file_name = basename($file_path);
+        $this->mask_name = $mask_name;
         $this->public = $public;
         $this->only_users = $only_users;
         $this->only_visitors = $only_visitors;
@@ -36,15 +38,19 @@ class Page {
         return $this->file_name;
     }
 
+    public function getMaskName(): string {
+        return $this->mask_name;
+    }
+
     public function isPublic(): ?bool {
         return $this->public;
     }
 
-    public function isOnlyUsers(): bool {
+    public function isOnlyForUsers(): bool {
         return $this->only_users;
     }
 
-    public function isOnlyVisitors(): bool {
+    public function isOnlyForVisitors(): bool {
         return $this->only_visitors;
     }
 

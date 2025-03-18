@@ -1,12 +1,12 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
-
 global $db_conn;
 global $route;
 global $session;
 global $user;
+global $page;
 
+//$session->successfulSingOut($user);
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -15,9 +15,9 @@ global $user;
         <meta name="viewport"
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>About</title>
+        <title><?= $page->getTitle() ?></title>
     </head>
     <body>
-
+        <?= $user->getLastName(); ?>
     </body>
 </html>

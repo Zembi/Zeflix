@@ -1,0 +1,11 @@
+# Enable the rewrite engine
+RewriteEngine On
+RewriteBase /
+
+# Dynamic rule: Match any non-existing path and redirect to index.php?view=<page>
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([^/]+)/?$ index.php?view=$1 [L,QSA]
+
+# If URL is root '/', rewrite it to index.php with a default view
+RewriteRule ^$ index.php?view=home [L]

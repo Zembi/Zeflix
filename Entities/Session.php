@@ -134,15 +134,30 @@ class Session {
         unset($_SESSION['old_login_input'], $_SESSION['login_errors'], $_SESSION['login_success']);
     }
 
+    private function clearUsersSessionData(): void {
+        unset($_SESSION['user_token_logged_in']);
+    }
+
 
     public function successfulSingIn(User $user): void {
         $this->clearVisitorsSessionData();
         $this->setUser($user);
 
-        $responseToken = $this->session_model->handle_user_session_token($_SESSION['user_token_logged_in'], $user, $this->route->getCurrentPage());
-        if($responseToken && !empty($responseToken)) {
-            $_SESSION['user_token_logged_in'] = $responseToken;
+        $user_token = $_SESSION['user_token_logged_in'] ?? null;
+        $responseToken = $this->session_model->handle_user_session_token($user_token, $user, $this->route->getCurrentPage());
+        if($responseToken['status']) {
+            $_SESSION['user_token_logged_in'] = $responseToken['response']['token'];
         }
+
+        $this->route->redirectToRoot();
+    }
+
+    public function successfulSingOut(User $user): void {
+        if(isset($_SESSION['user_token_logged_in'])) {
+            $this->session_model->delete_user_session_token($_SESSION['user_token_logged_in'], $user);
+        }
+
+        $this->clearUsersSessionData();
 
         $this->route->redirectToRoot();
     }
@@ -150,10 +165,11 @@ class Session {
     public function isUserLoggedInInSession(): bool {
         $user_token = $_SESSION['user_token_logged_in'] ?? null;
 
-        if($user_token && !empty($user_token)) {
-            $usernameFound = $this->session_model->confirm_user_session_token($user_token);
-            if($usernameFound) {
-                $user = $this->user->fetchUserDataFromDB(['username' => $usernameFound]);
+        if(!empty($user_token)) {
+            $username_found = $this->session_model->retrieve_user_from_session_token($user_token);
+            if($username_found['status']) {
+                $username = $username_found['response']['username'];
+                $user = $this->user->fetchUserDataFromDB(['username' => $username]);
                 if($user) {
                     $this->user = $user;
                     return true;

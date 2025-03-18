@@ -9,3 +9,4 @@ global $route;
 global $session;
 
 $user = new User($db_conn);
+
