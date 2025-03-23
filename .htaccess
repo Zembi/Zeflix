@@ -1,11 +1,26 @@
-# Enable the rewrite engine
+# ENABLE REWRITE ENGINE
 RewriteEngine On
 RewriteBase /
 
-# Dynamic rule: Match any non-existing path and redirect to index.php?view=<page>
+# HANDLE 403 ERRORS (CUSTOM ERROR PAGE)
+ErrorDocument 403 /index.php?view=403
+
+# ALLOW ACCESS TO INDEX.PHP, CSS, JS, IMAGES, AND OTHER ASSETS
+RewriteCond %{REQUEST_URI} ^/$ [OR]
+RewriteCond %{REQUEST_URI} ^/index.php$ [OR]
+RewriteCond %{REQUEST_URI} ^/assets/ [OR]
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|otf|eot)$ [NC]
+RewriteRule .* - [L]
+
+# ENSURE ROOT '/' GOES TO HOME PAGE
+RewriteRule ^$ index.php?view=home [L]
+
+# REDIRECT ALL OTHER REQUESTS TO index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^/]+)/?$ index.php?view=$1 [L,QSA]
+RewriteRule ^(.*)$ index.php?view=$1 [L,QSA]
 
-# If URL is root '/', rewrite it to index.php with a default view
-RewriteRule ^$ index.php?view=home [L]
+# BLOCK DIRECT ACCESS TO FILES & DIRECTORIES (EXCEPT THE ABOVE)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [F,L]

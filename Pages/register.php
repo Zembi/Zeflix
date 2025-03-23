@@ -59,7 +59,9 @@
         ?>
         <div class="sing-in-container">
             <div class="column">
-                <img class="zeflix-logo" src="../assets/images/zeflix_image.png" title="Zeflix" alt="zeflix logo" />
+                <a href="/">
+                    <img class="zeflix-logo" src="../assets/images/zeflix_image.png" title="Zeflix" alt="zeflix logo" />
+                </a>
                 <h2 class="title">Sign Up</h2>
                 <span class="subtitle simple-text">to continue to VideoTube</span>
                 <form class="register-form account-entry-form" method="POST" action="">

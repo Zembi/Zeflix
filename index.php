@@ -8,5 +8,4 @@ global $db_conn;
 global $route;
 global $session;
 
-$user = new User($db_conn);
 

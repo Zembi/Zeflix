@@ -27,52 +27,51 @@ catch (PDOException $e) {
     exit();
 }
 
+$maskName = isset($_GET['view']) ? strtolower(trim($_GET['view'], '/')) : 'root';
 
-$route = new Route($_SERVER['SCRIPT_FILENAME']);
+$route = new Route($maskName);
 $route->handleAllPages([
     new Page('Root', '-', 'index.php', 'root',null),
     new Page('404', 'Page not found', 'Pages/404.php', '404',null),
+    new Page('403', 'Forbidden Access', 'Pages/403.php', '403',null),
     new Page('Login', 'Sign In', 'Pages/login.php', 'login', true, false, true),
     new Page('Register', 'Sign Up', 'Pages/register.php', 'register', true, false, true),
     new Page('Home', 'Welcome to Zeflix', 'Pages/home.php', 'home',false, true, false),
     new Page('About', 'About Us', 'Pages/about.php', 'about',false, true, false),
 ]);
 
+$target_page = $route->getCurrentPage();
+
+// HANDLE 404 PAGE
+if(!$target_page) {
+    $target_page = $route->getErrorPage();
+}
 
 $user = new User($db_conn);
 $session = new Session($db_conn, $route);
 $session->setUser($user);
 
-$routeName = isset($_GET['view']) ? strtolower(trim($_GET['view'], '/')) : 'root';
-
-$page = $route->findPageByMaskName($routeName);
-
-if(!$page) {
-    $page = $route->getErrorPage();
-}
-
-//include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();
-
-
+// HANDLE REDIRECTS BASED ON USER AND PAGE STATUS
 if(!isset($_POST['submitLogin']) && !isset($_POST['submitRegister'])) {
-    $target_page = 'home';
     $is_user_logged_in = $session->isUserLoggedInInSession();
-    if(!$route->isCurrentPagePublic()) {
+    if(!$route->isTargetPagePublic()) {
         if(!$is_user_logged_in) {
-            $page = $route->findPageByMaskName('login');
-            include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();
-//            $route->redirectToPage('login');
+            $target_page = $route->findPageByMaskName('login');
+            $route->redirectToPage($target_page);
         }
+//        HOWEVER, THIS CASE IS BEING HANDLED FROM .htaccess FILE -> / WILL ALWAYS REDIRECT TO /home
         else if($route->getCurrentPageName() == 'Root') {
-//            $page = $route->findPageByMaskName($target_page);
-//            include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();
-//            $route->redirectToPage($target_page);
+            $target_page = $route->findPageByMaskName('home');
+            $route->redirectToPage($target_page);
         }
     }
     else {
         if($is_user_logged_in) {
-//            include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();
-//            $route->redirectToPage($target_page);
+            $target_page = $route->findPageByMaskName('home');
+            $route->redirectToPage($target_page);
         }
     }
 }
+
+$page = $target_page;
+include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();

@@ -8,25 +8,20 @@ class Route {
     /** @var Page[] */
     public array $pages_only_for_visitors = [];
 
-    private string $currentFilePath;
-    private string $currentFileName;
+    private string $currentPageMaskName;
 
     private Page $currentPage;
     private Page $errorPage;
     private ?bool $isCurrentPagePublic;
 
-    public function __construct(string $currentFilePath) {
-        $this->currentFilePath = $currentFilePath;
-        $this->currentFileName = strtolower(basename($currentFilePath));
+    public function __construct(string $currentPageMaskName) {
+        $this->currentPageMaskName = trim($currentPageMaskName, '/');
     }
 
-    public function getCurrentFilePath(): ?string {
-        return $this->currentFilePath;
+    public function getCurrentPageMaskName(): ?string {
+        return $this->currentPageMaskName;
     }
 
-    public function getCurrentFileName(): ?string {
-        return $this->currentFileName;
-    }
     public function getCurrentPage(): Page {
         return $this->currentPage;
     }
@@ -39,19 +34,18 @@ class Route {
         return $this->errorPage;
     }
 
-    public function isCurrentPagePublic(): ?bool {
+    public function isTargetPagePublic(): ?bool {
         return $this->isCurrentPagePublic;
     }
 
     public function handleAllPages(array $pages): void {
-        foreach ($pages as $page) {
+        foreach($pages as $page) {
             if(!$page instanceof Page) {
                 throw new InvalidArgumentException("All items in the pages array must be instances of Page.");
             }
 //            AVOID DUPLICATE ENTRIES IN ROUTING BASED ON FILE NAME
             $file = $page->getFile();
-            $page_name = $page->getName();
-            if($file && $this->isPageAlreadyAdded($page_name)) {
+            if($file && $this->isPageAlreadyAdded($page)) {
                 continue;
             }
 
@@ -59,65 +53,68 @@ class Route {
                 $this->errorPage = $page;
             }
 
-            $isCurrPage = $this->findPageFromFilePath($this->currentFilePath, $page->getFilePath());
-            if($isCurrPage) {
+//            FIND CURRENT PAGE
+            if($this->getCurrentPageMaskName() === $page->getMaskName()) {
                 $this->currentPage = $page;
                 $this->isCurrentPagePublic = $page->isPublic();
             }
 
-            $this->all_pages[$page->getName()] = $page;
+            $this->all_pages[$page->getMaskName()] = $page;
 
             if($page->isOnlyForUsers()) {
-                $this->pages_only_for_users[$page->getName()] = $page;
+                $this->pages_only_for_users[$page->getMaskName()] = $page;
             }
             else if($page->isOnlyForVisitors()) {
-                $this->pages_only_for_visitors[$page->getName()] = $page;
+                $this->pages_only_for_visitors[$page->getMaskName()] = $page;
             }
+        }
+
+//        IF CURRENT PAGE IS STILL NULL, SET CURRENT PAGE TO 404
+        if(!isset($this->currentPage) && !isset($this->isCurrentPagePublic)) {
+            $this->currentPage = $this->getErrorPage();
+            $this->isCurrentPagePublic = $page->isPublic();
         }
     }
 
-    private function isPageAlreadyAdded(string $page_name): bool {
+    private function isPageAlreadyAdded(Page $page_to_check): bool {
         foreach($this->all_pages as $existingPage) {
-            if($existingPage->getName() === $page_name) return true;
+            if($existingPage->getMaskName() === $page_to_check->getMaskName()) return true;
         }
         return false;
     }
 
-    private function findPageFromFilePath(string $absolutePath, string $relativePath): bool {
-        $basePath = "/var/www/html/";
-        $normalizedAbsolute = strtolower(str_replace($basePath, "", $absolutePath));
-        $normalizedRelative = strtolower($relativePath);
-
-        return $normalizedAbsolute === $normalizedRelative;
-    }
-
-    public function redirectToPage(?string $targetPage): void {
-        if(empty($targetPage) || $targetPage === 'root') {
-            $this->redirectToRoot();
+    public function redirectToPage(?Page $targetPage): void {
+        if(!isset($targetPage) || $targetPage->getMaskName() === 'root') {
             return;
         }
 
-        foreach($this->all_pages as $page) {
-            if($page->getMaskName() === $targetPage) {
-                header('Location: ' . $targetPage);
-            }
-        }
+
+        $urlPath = '/' . trim($targetPage->getMaskName(), '/');
+        header("Location: $urlPath");
+        exit();
     }
 
     public function redirectToRoot(): void {
-        foreach($this->all_pages as $page) {
-            if($page->getName() === 'Root') {
-                header('Location: /' . $page->getFile());
-            }
-        }
+        header('Location: /' . $this->all_pages['root']->getMaskName());
+//        header('Location: /');
     }
 
+
+//    HELPERS
     public function findPageByMaskName(?string $customName): ?Page {
-        foreach($this->all_pages as $page) {
-            if($page->getMaskName() === $customName) {
-                return $page;
-            }
+        if(isset($this->all_pages[$customName])) {
+            return $this->all_pages[$customName];
         }
+
+        $segments = explode('/', $customName);
+        while(!empty($segments)) {
+            $parentPath = implode('/', $segments);
+            if(isset($this->all_pages[$parentPath])) {
+                return $this->all_pages[$parentPath];
+            }
+            array_pop($segments);
+        }
+
         return null;
     }
 

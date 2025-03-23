@@ -13,7 +13,7 @@ class Session {
         $this->route = $route;
         if($db_conn) $this->initDbConnection($db_conn);
 
-        $this->setLastVisitedPage($this->route->getCurrentPageName());
+//        $this->setLastVisitedPage($this->route->getCurrentPageName());
 
         $this->user = null;
     }
