@@ -68,7 +68,7 @@
 
                     <input type="submit" name="submitLogin" class="simple-text" value="Log in"/>
                 </form>
-                <span>Don't have an account? <a href="<?= $route->getPageLink('Register') ?>">Sign Up here!</a></span>
+                <span>Don't have an account? <a href="<?= $route->getPageLink('register') ?>">Sign Up here!</a></span>
             </div>
         </div>
     </body>

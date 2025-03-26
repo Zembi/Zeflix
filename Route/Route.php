@@ -3,16 +3,16 @@
 class Route {
     /** @var Page[] */
     private array $all_pages = [];
-    /** @var Page[] */
-    public array $pages_only_for_users = [];
-    /** @var Page[] */
+    /** @var Private_Page[] */
+    public array $pages_only_for_logged_in_users = [];
+    /** @var Public_Page[] */
     public array $pages_only_for_visitors = [];
 
     private string $currentPageMaskName;
 
     private Page $currentPage;
     private Page $errorPage;
-    private ?bool $isCurrentPagePublic;
+    private ?bool $currentPageFound;
 
     public function __construct(string $currentPageMaskName) {
         $this->currentPageMaskName = trim($currentPageMaskName, '/');
@@ -26,16 +26,12 @@ class Route {
         return $this->currentPage;
     }
 
-    public function getCurrentPageName(): ?string {
-        return $this->currentPage->getName();
+    public function currPageExists(): ?bool {
+        return $this->currentPageFound;
     }
 
     public function getErrorPage(): Page {
         return $this->errorPage;
-    }
-
-    public function isTargetPagePublic(): ?bool {
-        return $this->isCurrentPagePublic;
     }
 
     public function handleAllPages(array $pages): void {
@@ -56,13 +52,13 @@ class Route {
 //            FIND CURRENT PAGE
             if($this->getCurrentPageMaskName() === $page->getMaskName()) {
                 $this->currentPage = $page;
-                $this->isCurrentPagePublic = $page->isPublic();
+                $this->currentPageFound = true;
             }
 
             $this->all_pages[$page->getMaskName()] = $page;
 
-            if($page->isOnlyForUsers()) {
-                $this->pages_only_for_users[$page->getMaskName()] = $page;
+            if($page->isOnlyForLoggedInUsers()) {
+                $this->pages_only_for_logged_in_users[$page->getMaskName()] = $page;
             }
             else if($page->isOnlyForVisitors()) {
                 $this->pages_only_for_visitors[$page->getMaskName()] = $page;
@@ -70,9 +66,9 @@ class Route {
         }
 
 //        IF CURRENT PAGE IS STILL NULL, SET CURRENT PAGE TO 404
-        if(!isset($this->currentPage) && !isset($this->isCurrentPagePublic)) {
+        if(!isset($this->currentPage)) {
             $this->currentPage = $this->getErrorPage();
-            $this->isCurrentPagePublic = $page->isPublic();
+            $this->currentPageFound = false;
         }
     }
 
@@ -118,11 +114,11 @@ class Route {
         return null;
     }
 
-    public function getPageLink(string $page_name): string {
-        foreach($this->all_pages as $page) {
-            if($page->getName() === $page_name) {
-                return '/' . $page->getMaskName();
-            }
+    public function getPageLink(string $page_mask_name): string {
+        $found_page = $this->findPageByMaskName($page_mask_name);
+
+        if($found_page) {
+            return '/' . $found_page->getMaskName();
         }
         return '/';
     }

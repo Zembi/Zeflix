@@ -110,7 +110,7 @@
 
                     <input type="submit" name="submitRegister" class="simple-text" value="Register"/>
                 </form>
-                <span>Already have an account? <a href="<?= $route->getPageLink('Login') ?>">Sign in here!</a></span>
+                <span>Already have an account? <a href="<?= $route->getPageLink('login') ?>">Sign in here!</a></span>
             </div>
         </div>
     </body>

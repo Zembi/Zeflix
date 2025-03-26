@@ -70,7 +70,7 @@ class User {
     }
 
 
-//  HASHING PASSWORD
+//   HASHING PASSWORD
     public function hashPassword() : string {
         return password_hash($this->getPassword(), PASSWORD_ARGON2ID);
     }
@@ -185,6 +185,7 @@ class User {
 
         $this->setUsername($username);
 
+//       *** LEFT IT IN COMMENT SO AS TO AVOID TYPING THE ACTUAL PASSWORD TO LOG IN
 //        $password_confirmed = $this->confirmHashedPasswordMatch($password);
 //        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
 
