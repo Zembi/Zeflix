@@ -1,5 +1,7 @@
 <?php
 
+namespace Tools;
+
 class FormSanitizer {
     public static function sanitizeFormString(string $string, bool $safeMode = false): string {
         $string = strip_tags($string);

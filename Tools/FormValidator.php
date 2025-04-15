@@ -1,5 +1,7 @@
 <?php
 
+namespace Tools;
+
 class FormValidator {
     public static function stringGreaterThan(string|bool $string, int $min = 3, int $max = 24): bool|string {
         return $string && strlen($string) >= $min && strlen($string) <= $max ? $string : false;

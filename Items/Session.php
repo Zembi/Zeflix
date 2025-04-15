@@ -1,6 +1,11 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/Models/Session.php';
+namespace Items;
+
+use Models\Session_Model;
+use Route\Route;
+
+use \PDO;
 
 class Session {
     private Session_Model $session_model;

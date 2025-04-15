@@ -1,13 +1,11 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Models/Model.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Items/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Items/Page/Page.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Items/Page/Public_Page.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Items/Page/Private_Page.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Items/Session.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Templates/NotificationMsg.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/Route/Route.php';
+use Items\User;
+use Items\Page\Page;
+use Items\Page\Public_Page;
+use Items\Page\Private_Page;
+use Items\Session;
+use Route\Route;
 
 ob_start();
 
@@ -32,6 +30,7 @@ catch (PDOException $e) {
 $maskName = isset($_GET['view']) ? strtolower(trim($_GET['view'], '/')) : 'root';
 
 $route = new Route($maskName);
+// IMPORTANT METHOD AS IT REGISTERS ALL AVAILABLE PAGES
 $route->handleAllPages([
     new Page('Root', '-', 'index.php', 'root'),
 
@@ -50,41 +49,48 @@ $user = new User($db_conn);
 $session = new Session($db_conn, $route);
 $session->setUser($user);
 
-// HANDLE 404 PAGE
-if(!$route->currPageExists()) {
-    $target_page = $route->getErrorPage();
-}
-// IF PAGE EXISTS IN ROUTE
-else {
-    $target_page = $route->getCurrentPage();
 
-    $is_user_logged_in = $session->isUserLoggedInInSession();
+$target_page = $route->getCurrentPage();
 
-    if(!isset($_POST['submitLogin']) && !isset($_POST['submitRegister'])) {
-        if($target_page->getName() == 'Root') {
-            if($is_user_logged_in) {
-                $target_page = $route->findPageByMaskName('home');
-            }
-            else {
-                $target_page = $route->findPageByMaskName('login');
-            }
-            $route->redirectToPage($target_page);
-            exit;
-        }
+$is_user_logged_in = $session->isUserLoggedInInSession();
 
-        if($target_page->isOnlyForLoggedInUsers() && !$is_user_logged_in) {
-            $target_page = $route->findPageByMaskName('login');
-            $route->redirectToPage($target_page);
-            exit;
-        }
-
-        else if($target_page->isOnlyForVisitors() && $is_user_logged_in) {
+if(!isset($_POST['submitLogin']) && !isset($_POST['submitRegister'])) {
+    if($target_page->getName() == 'Root') {
+        if($is_user_logged_in) {
             $target_page = $route->findPageByMaskName('home');
-            $route->redirectToPage($target_page);
-            exit;
         }
+        else {
+            $target_page = $route->findPageByMaskName('login');
+        }
+        $route->redirectToPage($target_page);
+        exit;
+    }
+
+    if($target_page->isOnlyForLoggedInUsers() && !$is_user_logged_in) {
+        $target_page = $route->findPageByMaskName('login');
+        $route->redirectToPage($target_page);
+        exit;
+    }
+
+    else if($target_page->isOnlyForVisitors() && $is_user_logged_in) {
+        $target_page = $route->findPageByMaskName('home');
+        $route->redirectToPage($target_page);
+        exit;
     }
 }
 
 $page = $target_page;
-include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath();
+?>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><?= $page->getTitle() ?></title>
+    <link rel="stylesheet" type="text/css" href="../assets/style/style.css" />
+
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/' . $page->getFilePath(); ?>
+
+</html>

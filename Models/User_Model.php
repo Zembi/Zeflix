@@ -1,5 +1,12 @@
 <?php
 
+namespace Models;
+
+use Tools\HandleInternalMsgs;
+use Items\User;
+
+use \PDO;
+
 class User_Model extends Model {
 //  FINDERS
     public function available_username(string $username): bool {

@@ -1,5 +1,7 @@
 <?php
 
+namespace Tools;
+
 class HandleInternalMsgs {
     public static function succesMsgOnReturn(array $data = []): array {
         return HandleInternalMsgs::handleMsgOnReturn(1, $data);

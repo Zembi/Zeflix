@@ -1,5 +1,7 @@
 <?php
 
+namespace Items\Page;
+
 class Page {
     private int $id;
     private string $name;

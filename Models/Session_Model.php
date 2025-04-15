@@ -1,5 +1,13 @@
 <?php
 
+namespace Models;
+
+use Items\User;
+use Items\Page\Page;
+use Tools\HandleInternalMsgs;
+
+use \PDO;
+
 class Session_Model extends Model {
     public function handle_user_session_token(?string $token, User $user, Page $currPage): array {
         $username = $user->getUsername();
@@ -72,10 +80,10 @@ class Session_Model extends Model {
         ]);
 
         if($deletedResponse && $deleteQuery->rowCount() > 0) {
-            return HandleInternalMsgs::succesMsgOnReturn(['msg' => 'User token has been deleted']);
+            return HandleInternalMsgs::succesMsgOnReturn(['msg' => 'UserModel token has been deleted']);
         }
 
-        return HandleInternalMsgs::errorMsgOnReturn(['msg' => 'User with given token has not been found']);
+        return HandleInternalMsgs::errorMsgOnReturn(['msg' => 'UserModel with given token has not been found']);
     }
 
     public function confirm_user_from_session_token(User $user, string $token): array {

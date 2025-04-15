@@ -1,5 +1,11 @@
 <?php
 
+namespace Route;
+
+use Items\Page\Page;
+use Items\Page\Public_Page;
+use Items\Page\Private_Page;
+
 class Route {
     /** @var Page[] */
     private array $all_pages = [];
@@ -18,7 +24,7 @@ class Route {
         $this->currentPageMaskName = trim($currentPageMaskName, '/');
     }
 
-    public function getCurrentPageMaskName(): ?string {
+    public function getCurrentPageMaskName(): string {
         return $this->currentPageMaskName;
     }
 

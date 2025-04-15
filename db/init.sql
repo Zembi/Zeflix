@@ -17,9 +17,6 @@ CREATE TABLE users (
     INDEX idx_email (email)
 );
 
-INSERT INTO users (first_name, last_name, username, email, password) VALUES
-    ('John', 'Doe', 'johndoe', 'john@example.com', 'hashed_password');
-
 
 CREATE TABLE session (
     username VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,

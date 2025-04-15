@@ -1,5 +1,7 @@
 <?php
 
+namespace Templates;
+
 class NotificationMsg {
     public static function successfulNotify(string $msg = ''): void {
         ?>

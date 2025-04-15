@@ -1,9 +1,13 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/HandleInternalMsgs.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/Models/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/FormSanitizer.php';
-require_once $_SERVER['DOCUMENT_ROOT'].'/Tools/FormValidator.php';
+namespace Items;
+
+use Tools\HandleInternalMsgs;
+use Tools\FormSanitizer;
+use Tools\FormValidator;
+use Models\User_Model;
+
+use \PDO;
 
 class User {
     private User_Model $user_model;
@@ -186,8 +190,10 @@ class User {
         $this->setUsername($username);
 
 //       *** LEFT IT IN COMMENT SO AS TO AVOID TYPING THE ACTUAL PASSWORD TO LOG IN
-//        $password_confirmed = $this->confirmHashedPasswordMatch($password);
-//        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
+        $password_confirmed = $this->confirmHashedPasswordMatch($password);
+        if(!$password_confirmed) $errors['password_wrong'] = 'Passwords is incorrect';
+
+        if(!empty($errors)) return HandleInternalMsgs::errorMsgOnReturn($errors);
 
         return $this->user_model->sign_in_user($sanitized_data);
     }
