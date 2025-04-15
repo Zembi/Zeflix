@@ -6,8 +6,6 @@ use Items\Page\Page;
 use Items\Page\Public_Page;
 use Items\Page\Private_Page;
 
-use \InvalidArgumentException;
-
 class Route {
     /** @var Page[] */
     private array $all_pages = [];
@@ -45,7 +43,7 @@ class Route {
     public function handleAllPages(array $pages): void {
         foreach($pages as $page) {
             if(!$page instanceof Page) {
-                throw new InvalidArgumentException("All items in the pages array must be instances of Page.");
+                throw new \InvalidArgumentException("All items in the pages array must be instances of Page.");
             }
 //            AVOID DUPLICATE ENTRIES IN ROUTING BASED ON FILE NAME
             $file = $page->getFile();
