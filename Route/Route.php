@@ -6,6 +6,8 @@ use Items\Page\Page;
 use Items\Page\Public_Page;
 use Items\Page\Private_Page;
 
+use \InvalidArgumentException;
+
 class Route {
     /** @var Page[] */
     private array $all_pages = [];
