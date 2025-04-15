@@ -7,7 +7,6 @@ use Items\Page\Page;
 use Tools\HandleInternalMsgs;
 
 use \PDO;
-use \PDOException;
 
 class Session_Model extends Model {
     public function handle_user_session_token(?string $token, User $user, Page $currPage): array {
@@ -54,7 +53,7 @@ class Session_Model extends Model {
                 return HandleInternalMsgs::succesMsgOnReturn(['token' => $newToken]);
 
             }
-            catch(PDOException $e) {
+            catch(\PDOException $e) {
                 if ($e->getCode() == 23000) {
                     continue;
                 }
